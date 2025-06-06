@@ -1,767 +1,829 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mixtape Meu bem 📻</title>
-  <style>
-    body {
-      background: #F0F2F5; /* Cinza claro pastel */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      font-family: 'Courier New', monospace;
-      color: #333;
-      user-select: none;
-      overflow: hidden; /* Evita scroll indesejado durante as animações */
-      overflow-x: hidden; /* Garante que não haverá rolagem horizontal */
-    }
-
-    h1 {
-      color: #515c70; /* Azul acinzentado pastel */
-      margin-bottom: 20px;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Estilo do rádio */
-    .radio-container {
-      position: relative;
-      background: #75301d; /* Corpo principal do rádio */
-      border-radius: 15px; /* Bordas mais arredondadas */
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Sombra mais suave e proeminente */
-      padding: 40px; /* Mais padding interno */
-      max-width: 550px; /* Definirá a largura máxima em telas grandes */
-      width: 95%; /* O rádio ocupará 95% da largura da tela, e não mais que 550px */
-      box-sizing: border-box; /* Crucial para o padding não aumentar a largura total */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      border: 2px solid #D3D3D3; /* Borda sutil para o rádio */
-      filter: drop-shadow(4px 4px 10px rgba(0, 0, 0, 0.15)); /* Sombra geral do rádio */
-      height: 650px; 
-    }
-
-    /* Detalhe da grade do alto-falante */
-    .speaker-grill {
-      width: 80%;
-      height: 60px;
-      background-color: #ede8cb; /* Cinza pastel para a grade */
-      border-radius: 5px;
-      margin-top: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
-      align-items: center;
-      padding: 5px 0;
-      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .speaker-grill div {
-      width: 8px;
-      height: 8px;
-      background-color: #2d2d2d; /* Cinza mais escuro para os furos */
-      border-radius: 50%;
-      margin: 2px;
-    }
-
-    /* Área do display/medidor (como na imagem) */
-    .display-area {
-      background-color: #515c70; /* Azul claro pastel para o display */
-      width: 80%;
-      height: 120px; /* Altura do visor */
-      border-radius: 5px;
-      margin-top: 20px;
-      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5em; /* Aumentado o tamanho da fonte */
-      color: #ffffff;
-      padding: 5px 10px; /* Adicionado padding */
-      text-align: center;
-      box-sizing: border-box; /* Garante que padding não aumente o tamanho total */
-    }
-
-    /* Controles de volume e sintonia (simulados) */
-    .radio-knobs {
-      display: flex;
-      width: 80%;
-      justify-content: space-around;
-      margin-top: 20px;
-    }
-
-    .knob {
-      width: 55px;
-      height: 55px;
-      background-color: #ebefdb; /* Pêssego pastel para os botões giratórios */
-      border-radius: 50%;
-      border: 2px solid #ebefdb; /* Salmão pastel */
-      cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 0.8em;
-      color: #000000;
-    }
-
-    /* Compartimento da fita */
-    .cassette-deck {
-      background: #6d6d6d; /* Branco fantasma */
-      border: 2px solid #D3D3D3; /* Cinza claro */
-      border-radius: 5px;
-      width: 85%; /* Ajustado para caber melhor no rádio */
-      height: 200px; /* Altura do deck para acomodar a fita */
-      margin-top: 30px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden; /* Mantenha hidden para o efeito de inserção/ejeção */
-      position: relative;
-      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.15); /* Sombra interna para profundidade */
-    }
-
-    /* Estilos da fita cassete */
-    .card {
-      width: 280px; /* Largura da fita */
-      height: 140px; /* Altura da fita */
-      background: #3E4B57; /* Corpo da fita branco */
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      position: absolute;
-      top: -150px; /* Fita acima do deck, ajuste se precisar */
-      opacity: 0;
-      transform: translateY(0px); /* Posição inicial no topo */
-      transition: transform 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.5s ease-in-out;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      box-sizing: border-box;
-      z-index: 2; /* Para garantir que fique acima do deck */
-    }
-
-    /* Animação de inserção da fita */
-    .card.inserted {
-      transform: translateY(180px); /* Ajuste este valor. Ex: 150px (sua altura) + 30px (margem) = 180px */
-      opacity: 1;
-    }
-
-    .ups, .downs {
-      display: flex;
-      justify-content: space-between;
-      width: 95%; /* Para os parafusos ficarem mais nos cantos */
-      position: absolute;
-      left: 2.5%;
-    }
-
-    .ups { top: 8px; }
-    .downs { bottom: 8px; }
-
-    .screw {
-      background-color: #D3D3D3; /* Cinza claro */
-      height: 10px;
-      width: 10px;
-      border-radius: 50%;
-      border: 1px solid #A9A9A9;
-      box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
-    }
-
-    .line {
-      width: 80%;
-      height: 1px;
-      background-color: #E0E0E0;
-      margin: 4px 0;
-    }
-
-    .yl {
-      background-color: #CCFFC8; /* Amarelo pálido pastel */
-      border-radius: 5px;
-      padding: 8px;
-      width: 85%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
-      margin-top: 5px; /* Ajuste fino */
-    }
-
-    .roll {
-      background-color: #7d2a2a; /* Cinza claro para o rolo */
-      border-radius: 15px;
-      padding: 5px 15px;
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      width: 70%;
-    }
-
-    .tape {
-      background-color: #1d1f1d; /* Azul claro pastel para os carretéis */
-      width: 25px;
-      height: 25px;
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
-    }
-
-    .s_wheel, .e_wheel {
-      width: 15px;
-      height: 15px;
-      border: 1px dashed #FFF;
-      border-radius: 50%;
-      box-shadow: 0 0 0 2px #FFF;
-      animation-play-state: paused; /* Inicia pausada */
-    }
-
-    /* Animação de rotação dos carretéis */
-    .spinning .s_wheel, .spinning .e_wheel {
-      animation: run 2s linear infinite;
-      animation-play-state: running;
-    }
-
-    .num {
-      color: #fffcfc;
-      font-size: 0.9em;
-      font-weight: bold;
-    }
-
-    .or {
-      background-color: #567156; /* Verde pálido pastel */
-      color: #faf6f6;
-      border-radius: 0 0 5px 5px;
-      padding: 5px;
-      width: 87%;
-      text-align: center;
-      font-size: 0.9em;
-      margin-bottom: 5px; /* Ajuste fino */
-    }
-
-    /* Controles de play/pause e agora o Insert */
-    .player-controls {
-      margin-top: 30px;
-      display: flex;
-      gap: 10px; /* Espaço entre os grupos de botões */
-      flex-wrap: wrap;
-      justify-content: center; /* Centraliza os grupos de botões */
-    }
-
-    /* Estilo do grupo de botões (Play, Prev, Next, Pause e agora Insert) */
-    .radio-button-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background-color: #D3D3D3; /* Cinza claro pastel */
-      padding: 6px;
-      border-radius: 8px;
-      overflow: hidden;
-      height: 94px; /* Altura original do exemplo */
-      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .radio-button-group input[type="radio"] {
-      display: none; /* Esconde os inputs de rádio nativos */
-    }
-
-    .radio-button-group .label {
-      width: 70px; /* Largura padrão para Prev, Play, Pause, Next */
-      height: 80px;
-      background-color: #959b67; /* Branco fantasma para o corpo do botão */
-      border-radius: 4px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 6px;
-      border-top: 1px solid #E0E0E0; /* Borda mais clara */
-      transition: all 0.1s linear;
-      position: relative;
-      z-index: 2;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Sombra mais suave */
-    }
-
-    /* Específico para o botão Insert dentro do grupo */
-    .radio-button-group .label[for="insertBtn"] {
-        width: 80px; /* Largura um pouco maior para "Insert" se necessário, ajuste conforme o texto */
-    }
-
-
-    .radio-button-group .label .back-side {
-      position: absolute;
-      top: -10px;
-      left: 0px;
-      background-color: #F8F8FF; /* Mantém a cor do corpo */
-      border-radius: 4px 4px 2px 2px;
-      width: 100%;
-      height: 14px;
-      box-shadow:
-        inset 0 5px 3px 1px rgba(0, 0, 0, 0.05), /* Sombras mais suaves */
-        inset 0px -5px 2px 0px rgba(173, 216, 230, 0.1); /* Azul pastel claro para o brilho */
-      transform: perspective(300px) rotateX(50deg);
-      z-index: 1;
-      opacity: 0;
-      transition: all 0.1s linear;
-    }
-
-    .radio-button-group .label:has(input[type="radio"]:checked) .back-side {
-      opacity: 1;
-    }
-
-    .radio-button-group .label:has(input[type="radio"]:checked) {
-      transform: perspective(200px) rotateX(-18deg);
-      transform-origin: 50% 40%;
-      box-shadow: inset 0px -20px 15px 0px rgba(0, 0, 0, 0.1); /* Sombra mais suave */
-      border-top: 1px solid #ADD8E6; /* Azul claro pastel para a borda ativada */
-      margin-top: 6px;
-      border-radius: 0 0 4px 4px;
-    }
-
-    .radio-button-group .label .text {
-      color: #000000; /* Cinza médio */
-      font-size: 15px;
-      line-height: 12px;
-      padding: 0px;
-      font-weight: 800;
-      text-transform: uppercase;
-      transition: all 0.1s linear;
-      text-shadow: -1px -1px 1px rgba(224, 224, 224, 0.1);
-    }
-
-    .radio-button-group input[type="radio"]:checked + .text {
-      color: #ADD8E6; /* Azul claro pastel */
-      text-shadow:
-        0px 0px 8px rgba(173, 216, 230, 0.8), /* Brilho pastel */
-        1px 1px 2px rgba(0, 0, 0, 0.5); /* Sombra de texto mais suave */
-    }
-
-    .radio-button-group .label .bottom-line {
-      width: 100%;
-      height: 4px;
-      border-radius: 999px;
-      background-color: #421616; /* Cinza claro */
-      box-shadow: 0 0 3px 0px rgba(19, 19, 19, 0.1); /* Sombra suave */
-      border-top: 1px solid #E0E0E0; /* Borda mais clara */
-      transition: all 0.1s linear;
-    }
-
-    .radio-button-group .label:has(input[type="radio"]:checked) .bottom-line {
-      background-color: #959b67; /* Cinza um pouco mais escuro */
-      border-top: 1px solid rgba(173, 216, 230, 0.4); /* Azul pastel claro */
-    }
-
-    @keyframes run {
-      100% {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* --- Media Queries para Responsividade (Ajustes Detalhados para Celular) --- */
-    @media (max-width: 600px) { /* Aplica-se a telas com no máximo 600px de largura */
+  <!DOCTYPE html>
+  <html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mixtape Meu bem 📻</title>
+    <style>
       body {
-        height: auto;
-        min-height: 100vh;
-        padding: 10px 0; /* Menos padding vertical */
-        overflow-x: hidden;
+        background: #F0F2F5; /* Cinza claro pastel */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        font-family: 'Courier New', monospace;
+        color: #333;
+        user-select: none;
+        overflow: hidden; /* Evita scroll indesejado durante as animações */
+        overflow-x: hidden; /* Garante que não haverá rolagem horizontal */
       }
 
       h1 {
-        font-size: 1.4em; /* Título um pouco menor */
-        margin-bottom: 10px;
+        color: #515c70; /* Azul acinzentado pastel */
+        margin-bottom: 20px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
       }
 
+      /* Estilo do rádio */
       .radio-container {
-        max-width: 550px; /* Mantém a largura máxima para desktop */
-        width: 98%; /* Ocupa quase 100% da largura em mobile */
-        padding: 15px; /* Reduzindo ainda mais o padding interno do rádio */
-        height: auto; /* A altura será determinada pelo conteúdo */
-        min-height: 500px; /* Garante que o rádio não fique 'amassado' demais */
+        position: relative;
+        background: #75301d; /* Corpo principal do rádio */
+        border-radius: 15px; /* Bordas mais arredondadas */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Sombra mais suave e proeminente */
+        padding: 40px; /* Mais padding interno */
+        max-width: 550px; /* Definirá a largura máxima em telas grandes */
+        width: 95%; /* O rádio ocupará 95% da largura da tela, e não mais que 550px */
+        box-sizing: border-box; /* Crucial para o padding não aumentar a largura total */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 2px solid #D3D3D3; /* Borda sutil para o rádio */
+        filter: drop-shadow(4px 4px 10px rgba(0, 0, 0, 0.15)); /* Sombra geral do rádio */
+        height: 650px; 
       }
 
+      /* Detalhe da grade do alto-falante */
       .speaker-grill {
-        width: 90%;
-        height: 35px; /* Grade do alto-falante mais compacta */
+        width: 80%;
+        height: 60px;
+        background-color: #ede8cb; /* Cinza pastel para a grade */
+        border-radius: 5px;
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        align-items: center;
+        padding: 5px 0;
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
       }
 
       .speaker-grill div {
-        width: 6px; /* Furos menores */
-        height: 6px;
+        width: 8px;
+        height: 8px;
+        background-color: #2d2d2d; /* Cinza mais escuro para os furos */
+        border-radius: 50%;
+        margin: 2px;
       }
 
+      /* Área do display/medidor (como na imagem) */
       .display-area {
-        width: 90%;
-        height: 70px; /* Visor mais compacto */
-        font-size: 1em; /* Tamanho da fonte do visor */
-        padding: 3px 5px; /* Menos padding no visor */
+        background-color: #515c70; /* Azul claro pastel para o display */
+        width: 80%;
+        height: 120px; /* Altura do visor */
+        border-radius: 5px;
+        margin-top: 20px;
+        box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5em; /* Aumentado o tamanho da fonte */
+        color: #ffffff;
+        padding: 5px 10px; /* Adicionado padding */
+        text-align: center;
+        box-sizing: border-box; /* Garante que padding não aumente o tamanho total */
       }
 
+      /* Controles de volume e sintonia (simulados) */
       .radio-knobs {
-        width: 95%; /* Ocupa mais largura */
-        justify-content: space-around; /* Mantém o espaçamento flexível */
-        margin-top: 15px;
-        gap: 8px; /* Reduzindo o gap entre os knobs */
+        display: flex;
+        width: 80%;
+        justify-content: space-around;
+        margin-top: 20px;
       }
 
       .knob {
-        width: 45px; /* Knobs ligeiramente menores */
-        height: 45px;
-        font-size: 0.7em;
+        width: 55px;
+        height: 55px;
+        background-color: #ebefdb; /* Pêssego pastel para os botões giratórios */
+        border-radius: 50%;
+        border: 2px solid #ebefdb; /* Salmão pastel */
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 0.8em;
+        color: #000000;
       }
 
+      /* Compartimento da fita */
       .cassette-deck {
-        width: 90%; /* Deck da fita ocupa mais largura */
-        height: 150px; /* Deck mais compacto */
-        margin-top: 20px;
-        padding: 5px; /* Adicionado padding para o deck, caso não tivesse */
-        box-sizing: border-box; /* Garante que o padding não aumente o tamanho */
+        background: #6d6d6d; /* Branco fantasma */
+        border: 2px solid #D3D3D3; /* Cinza claro */
+        border-radius: 5px;
+        width: 85%; /* Ajustado para caber melhor no rádio */
+        height: 200px; /* Altura do deck para acomodar a fita */
+        margin-top: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden; /* Mantenha hidden para o efeito de inserção/ejeção */
+        position: relative;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.15); /* Sombra interna para profundidade */
       }
 
       /* Estilos da fita cassete */
       .card {
-        width: 210px; /* Largura da fita reduzida */
-        height: 105px; /* Altura da fita reduzida para manter proporção (2:1) */
-        padding: 5px; /* Padding da fita reduzido */
-        transform: translateY(155px); /* Ajusta a posição de inserção (metade da altura do deck + metade da altura da fita) */
+        width: 280px; /* Largura da fita */
+        height: 140px; /* Altura da fita */
+        background: #3E4B57; /* Corpo da fita branco */
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        position: absolute;
+        top: -150px; /* Fita acima do deck, ajuste se precisar */
+        opacity: 0;
+        transform: translateY(0px); /* Posição inicial no topo */
+        transition: transform 7s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.5s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        box-sizing: border-box;
+        z-index: 2; /* Para garantir que fique acima do deck */
+      }
+
+      /* Animação de inserção da fita */
+      .card.inserted {
+        transform: translateY(180px); /* Ajuste este valor. Ex: 150px (sua altura) + 30px (margem) = 180px */
+        opacity: 1;
+      }
+
+      .ups, .downs {
+        display: flex;
+        justify-content: space-between;
+        width: 95%; /* Para os parafusos ficarem mais nos cantos */
+        position: absolute;
+        left: 2.5%;
+      }
+
+      .ups { top: 8px; }
+      .downs { bottom: 8px; }
+
+      .screw {
+        background-color: #D3D3D3; /* Cinza claro */
+        height: 10px;
+        width: 10px;
+        border-radius: 50%;
+        border: 1px solid #A9A9A9;
+        box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
+      }
+
+      .line {
+        width: 80%;
+        height: 1px;
+        background-color: #E0E0E0;
+        margin: 4px 0;
+      }
+
+      .yl {
+        background-color: #CCFFC8; /* Amarelo pálido pastel */
+        border-radius: 5px;
+        padding: 8px;
+        width: 85%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
+        margin-top: 5px; /* Ajuste fino */
       }
 
       .roll {
-        padding: 3px 10px; /* Padding dos rolos */
+        background-color: #7d2a2a; /* Cinza claro para o rolo */
+        border-radius: 15px;
+        padding: 5px 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        width: 70%;
       }
 
       .tape {
-        width: 18px; /* Carreteis menores */
-        height: 18px;
+        background-color: #1d1f1d; /* Azul claro pastel para os carretéis */
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
       }
 
       .s_wheel, .e_wheel {
-        width: 10px; /* Rodinhas menores */
-        height: 10px;
+        width: 15px;
+        height: 15px;
+        border: 1px dashed #FFF;
+        border-radius: 50%;
+        box-shadow: 0 0 0 2px #FFF;
+        animation-play-state: paused; /* Inicia pausada */
+      }
+
+      /* Animação de rotação dos carretéis */
+      .spinning .s_wheel, .spinning .e_wheel {
+        animation: run 2s linear infinite;
+        animation-play-state: running;
       }
 
       .num {
-        font-size: 0.6em; /* Texto do contador da fita menor */
+        color: #fffcfc;
+        font-size: 0.9em;
+        font-weight: bold;
       }
 
       .or {
-        padding: 3px;
-        font-size: 0.7em;
+        background-color: #567156; /* Verde pálido pastel */
+        color: #faf6f6;
+        border-radius: 0 0 5px 5px;
+        padding: 5px;
+        width: 87%;
+        text-align: center;
+        font-size: 0.9em;
+        margin-bottom: 5px; /* Ajuste fino */
       }
 
+      /* Controles de play/pause e agora o Insert */
       .player-controls {
-        flex-direction: row; /* Tenta manter os botões na horizontal */
-        flex-wrap: wrap; /* Permite quebrar, mas com mais espaço */
-        justify-content: center;
-        margin-top: 15px;
-        gap: 8px; /* Reduzindo gap entre grupos de botões */
-        width: 100%; /* Garante que o container de controles ocupe toda a largura */
+        margin-top: 30px;
+        display: flex;
+        gap: 10px; /* Espaço entre os grupos de botões */
+        flex-wrap: wrap;
+        justify-content: center; /* Centraliza os grupos de botões */
       }
 
+      /* Estilo do grupo de botões (Play, Prev, Next, Pause e agora Insert) */
       .radio-button-group {
-        width: auto; /* Permite que o grupo de botões ocupe apenas o espaço necessário */
-        padding: 4px; /* Padding menor no grupo */
-        height: auto;
-        flex-wrap: nowrap; /* Tenta forçar os botões a ficarem na mesma linha DENTRO do grupo */
-        gap: 4px; /* Gap mínimo entre os botões */
-        justify-content: space-around; /* Melhor distribuição dos botões dentro do grupo */
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08); /* Sombra mais sutil */
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background-color: #D3D3D3; /* Cinza claro pastel */
+        padding: 6px;
+        border-radius: 8px;
+        overflow: hidden;
+        height: 94px; /* Altura original do exemplo */
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .radio-button-group input[type="radio"] {
+        display: none; /* Esconde os inputs de rádio nativos */
       }
 
       .radio-button-group .label {
-        width: 48px; /* Botões de controle menores */
-        height: 55px; /* Altura dos botões */
-        padding: 4px 2px; /* Padding interno dos botões */
+        width: 70px; /* Largura padrão para Prev, Play, Pause, Next */
+        height: 80px;
+        background-color: #959b67; /* Branco fantasma para o corpo do botão */
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 6px;
+        border-top: 1px solid #E0E0E0; /* Borda mais clara */
+        transition: all 0.1s linear;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Sombra mais suave */
       }
 
+      /* Específico para o botão Insert dentro do grupo */
       .radio-button-group .label[for="insertBtn"] {
-        width: 58px; /* Ajuste para o botão Insert ser um pouco maior */
+          width: 80px; /* Largura um pouco maior para "Insert" se necessário, ajuste conforme o texto */
       }
 
-      .radio-button-group .label .text {
-        font-size: 10px; /* Fonte bem pequena para o texto dos botões */
-        line-height: 10px; /* Ajusta a altura da linha */
+
+      .radio-button-group .label .back-side {
+        position: absolute;
+        top: -10px;
+        left: 0px;
+        background-color: #F8F8FF; /* Mantém a cor do corpo */
+        border-radius: 4px 4px 2px 2px;
+        width: 100%;
+        height: 14px;
+        box-shadow:
+          inset 0 5px 3px 1px rgba(0, 0, 0, 0.05), /* Sombras mais suaves */
+          inset 0px -5px 2px 0px rgba(173, 216, 230, 0.1); /* Azul pastel claro para o brilho */
+        transform: perspective(300px) rotateX(50deg);
+        z-index: 1;
+        opacity: 0;
+        transition: all 0.1s linear;
+      }
+
+      .radio-button-group .label:has(input[type="radio"]:checked) .back-side {
+        opacity: 1;
       }
 
       .radio-button-group .label:has(input[type="radio"]:checked) {
-        transform: perspective(150px) rotateX(-15deg); /* Ajuste para o efeito de botão pressionado */
-        margin-top: 4px; /* Ajuste para o botão pressionado */
+        transform: perspective(200px) rotateX(-18deg);
+        transform-origin: 50% 40%;
+        box-shadow: inset 0px -20px 15px 0px rgba(0, 0, 0, 0.1); /* Sombra mais suave */
+        border-top: 1px solid #ADD8E6; /* Azul claro pastel para a borda ativada */
+        margin-top: 6px;
+        border-radius: 0 0 4px 4px;
       }
-    }
-  </style>
-</head>
-<body>
-  <h1>Mixtape Meu Bem 📻</h1>
 
-  <div class="radio-container">
-    <div class="speaker-grill">
-      <div></div><div></div><div></div><div></div><div></div><div></div>
-      <div></div><div></div><div></div><div></div><div></div><div></div>
-      <div></div><div></div><div></div><div></div><div></div><div></div>
-      <div></div><div></div><div></div><div></div><div></div><div></div>
-      <div></div><div></div><div></div><div></div><div></div><div></div>
-    </div>
+      .radio-button-group .label .text {
+        color: #000000; /* Cinza médio */
+        font-size: 15px;
+        line-height: 12px;
+        padding: 0px;
+        font-weight: 800;
+        text-transform: uppercase;
+        transition: all 0.1s linear;
+        text-shadow: -1px -1px 1px rgba(224, 224, 224, 0.1);
+      }
 
-    <div class="display-area">
-      <span id="mixtape-title">Carregando...</span>
-    </div>
+      .radio-button-group input[type="radio"]:checked + .text {
+        color: #ADD8E6; /* Azul claro pastel */
+        text-shadow:
+          0px 0px 8px rgba(173, 216, 230, 0.8), /* Brilho pastel */
+          1px 1px 2px rgba(0, 0, 0, 0.5); /* Sombra de texto mais suave */
+      }
 
-    <div class="radio-knobs">
-      <div class="knob">Volume</div>
-      <div class="knob">Tuning</div>
-    </div>
+      .radio-button-group .label .bottom-line {
+        width: 100%;
+        height: 4px;
+        border-radius: 999px;
+        background-color: #421616; /* Cinza claro */
+        box-shadow: 0 0 3px 0px rgba(19, 19, 19, 0.1); /* Sombra suave */
+        border-top: 1px solid #E0E0E0; /* Borda mais clara */
+        transition: all 0.1s linear;
+      }
 
-    <div class="cassette-deck">
-      <div class="card" id="cassette">
-        <div class="ups">
-          <div class="screw"></div>
-          <div class="screw"></div>
-        </div>
-        <div class="line"></div>
-        <div class="line"></div>
-        <div class="yl">
-          <div class="roll">
-            <div class="tape">
-              <div class="s_wheel"></div>
+      .radio-button-group .label:has(input[type="radio"]:checked) .bottom-line {
+        background-color: #959b67; /* Cinza um pouco mais escuro */
+        border-top: 1px solid rgba(173, 216, 230, 0.4); /* Azul pastel claro */
+      }
+
+      @keyframes run {
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* --- Media Queries para Responsividade (Ajustes Detalhados para Celular) --- */
+      @media (max-width: 600px) { /* Aplica-se a telas com no máximo 600px de largura */
+        body {
+          height: auto;
+          min-height: 100vh;
+          padding: 10px 0; /* Menos padding vertical */
+          overflow-x: hidden;
+        }
+
+        h1 {
+          font-size: 1.4em; /* Título um pouco menor */
+          margin-bottom: 10px;
+        }
+
+        .radio-container {
+          max-width: 550px; /* Mantém a largura máxima para desktop */
+          width: 98%; /* Ocupa quase 100% da largura em mobile */
+          padding: 15px; /* Reduzindo ainda mais o padding interno do rádio */
+          height: auto; /* A altura será determinada pelo conteúdo */
+          min-height: 500px; /* Garante que o rádio não fique 'amassado' demais */
+        }
+
+        .speaker-grill {
+          width: 90%;
+          height: 35px; /* Grade do alto-falante mais compacta */
+        }
+
+        .speaker-grill div {
+          width: 6px; /* Furos menores */
+          height: 6px;
+        }
+
+        .display-area {
+          width: 90%;
+          height: 70px; /* Visor mais compacto */
+          font-size: 1em; /* Tamanho da fonte do visor */
+          padding: 3px 5px; /* Menos padding no visor */
+        }
+
+        .radio-knobs {
+          width: 95%; /* Ocupa mais largura */
+          justify-content: space-around;
+          margin-top: 15px;
+          gap: 8px; /* Reduzindo o gap entre os knobs */
+        }
+
+        .knob {
+          width: 45px; /* Knobs ligeiramente menores */
+          height: 45px;
+          font-size: 0.7em;
+        }
+
+        .cassette-deck {
+          width: 90%; /* Deck da fita ocupa mais largura */
+          height: 150px; /* Deck mais compacto */
+          margin-top: 20px;
+          padding: 5px; /* Adicionado padding para o deck, caso não tivesse */
+          box-sizing: border-box; /* Garante que o padding não aumente o tamanho */
+        }
+
+        /* Estilos da fita cassete */
+        .card {
+          width: 210px; /* Largura da fita reduzida */
+          height: 105px; /* Altura da fita reduzida para manter proporção (2:1) */
+          padding: 5px; /* Padding da fita reduzido */
+          transform: translateY(155px); /* Ajusta a posição de inserção (metade da altura do deck + metade da altura da fita) */
+        }
+
+        .roll {
+          padding: 3px 10px; /* Padding dos rolos */
+        }
+
+        .tape {
+          width: 18px; /* Carreteis menores */
+          height: 18px;
+        }
+
+        .s_wheel, .e_wheel {
+          width: 10px; /* Rodinhas menores */
+          height: 10px;
+        }
+
+        .num {
+          font-size: 0.6em; /* Texto do contador da fita menor */
+        }
+
+        .or {
+          padding: 3px;
+          font-size: 0.7em;
+        }
+
+        .player-controls {
+          flex-direction: row; /* Tenta manter os botões na horizontal */
+          flex-wrap: wrap; /* Permite quebrar, mas com mais espaço */
+          justify-content: center;
+          margin-top: 15px;
+          gap: 8px; /* Reduzindo gap entre grupos de botões */
+          width: 100%; /* Garante que o container de controles ocupe toda a largura */
+        }
+
+        .radio-button-group {
+          width: auto; /* Permite que o grupo de botões ocupe apenas o espaço necessário */
+          padding: 4px; /* Padding menor no grupo */
+          height: auto;
+          flex-wrap: nowrap; /* Tenta forçar os botões a ficarem na mesma linha DENTRO do grupo */
+          gap: 4px; /* Gap mínimo entre os botões */
+          justify-content: space-around; /* Melhor distribuição dos botões dentro do grupo */
+          box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08); /* Sombra mais sutil */
+        }
+
+        .radio-button-group .label {
+          width: 48px; /* Botões de controle menores */
+          height: 55px; /* Altura dos botões */
+          padding: 4px 2px; /* Padding interno dos botões */
+        }
+
+        .radio-button-group .label[for="insertBtn"] {
+          width: 58px; /* Ajuste para o botão Insert ser um pouco maior */
+        }
+
+        .radio-button-group .label .text {
+          font-size: 10px; /* Fonte bem pequena para o texto dos botões */
+          line-height: 10px; /* Ajusta a altura da linha */
+        }
+
+        .radio-button-group .label:has(input[type="radio"]:checked) {
+          transform: perspective(150px) rotateX(-15deg); /* Ajuste para o efeito de botão pressionado */
+          margin-top: 4px; /* Ajuste para o botão pressionado */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Mixtape Meu Bem 📻</h1>
+
+    <div class="radio-container">
+      <div class="speaker-grill">
+        <div></div><div></div><div></div><div></div><div></div><div></div>
+        <div></div><div></div><div></div><div></div><div></div><div></div>
+        <div></div><div></div><div></div><div></div><div></div><div></div>
+        <div></div><div></div><div></div><div></div><div></div><div></div>
+        <div></div><div></div><div></div><div></div><div></div><div></div>
+      </div>
+
+      <div class="display-area">
+        <span id="mixtape-title">Carregando...</span>
+      </div>
+
+      <div class="radio-knobs">
+        <div class="knob">Volume</div>
+        <div class="knob">Tuning</div>
+      </div>
+
+      <div class="cassette-deck">
+        <div class="card" id="cassette">
+          <div class="ups">
+            <div class="screw"></div>
+            <div class="screw"></div>
+          </div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="yl">
+            <div class="roll">
+              <div class="tape">
+                <div class="s_wheel"></div>
+              </div>
+              <div class="tape">
+                <div class="e_wheel"></div>
+              </div>
+              <div class="num">Mixtape</div>
             </div>
-            <div class="tape">
-              <div class="e_wheel"></div>
-            </div>
-            <div class="num">Mixtape</div>
+          </div>
+          <div class="or">Oii meu bem</div>
+          <div class="downs">
+            <div class="screw"></div>
+            <div class="screw"></div>
           </div>
         </div>
-        <div class="or">Oii meu bem</div>
-        <div class="downs">
-          <div class="screw"></div>
-          <div class="screw"></div>
+      </div>
+
+      <div class="player-controls">
+        <div class="radio-button-group">
+          <label class="label" for="insertBtn">
+            <input type="radio" name="radio-insert" id="insertBtn"> 
+            <div class="back-side"></div>
+            <span class="text">Insert</span>
+            <div class="bottom-line"></div>
+          </label>
+          <label class="label" for="prevBtn">
+            <input type="radio" name="radio-controls" id="prevBtn">
+            <div class="back-side"></div>
+            <span class="text">Prev</span>
+            <div class="bottom-line"></div>
+          </label>
+          <label class="label" for="playBtn">
+            <input type="radio" name="radio-controls" id="playBtn">
+            <div class="back-side"></div>
+            <span class="text">Play</span>
+            <div class="bottom-line"></div>
+          </label>
+          <label class="label" for="pauseBtn">
+            <input type="radio" name="radio-controls" id="pauseBtn">
+            <div class="back-side"></div>
+            <span class="text">Pause</span>
+            <div class="bottom-line"></div>
+          </label>
+          <label class="label" for="nextBtn">
+            <input type="radio" name="radio-controls" id="nextBtn">
+            <div class="back-side"></div>
+            <span class="text">Next</span>
+            <div class="bottom-line"></div>
+          </label>
         </div>
       </div>
     </div>
 
-    <div class="player-controls">
-      <div class="radio-button-group">
-        <label class="label" for="insertBtn">
-          <input type="radio" name="radio-insert" id="insertBtn"> 
-          <div class="back-side"></div>
-          <span class="text">Insert</span>
-          <div class="bottom-line"></div>
-        </label>
-        <label class="label" for="prevBtn">
-          <input type="radio" name="radio-controls" id="prevBtn">
-          <div class="back-side"></div>
-          <span class="text">Prev</span>
-          <div class="bottom-line"></div>
-        </label>
-        <label class="label" for="playBtn">
-          <input type="radio" name="radio-controls" id="playBtn">
-          <div class="back-side"></div>
-          <span class="text">Play</span>
-          <div class="bottom-line"></div>
-        </label>
-        <label class="label" for="pauseBtn">
-          <input type="radio" name="radio-controls" id="pauseBtn">
-          <div class="back-side"></div>
-          <span class="text">Pause</span>
-          <div class="bottom-line"></div>
-        </label>
-        <label class="label" for="nextBtn">
-          <input type="radio" name="radio-controls" id="nextBtn">
-          <div class="back-side"></div>
-          <span class="text">Next</span>
-          <div class="bottom-line"></div>
-        </label>
-      </div>
-    </div>
-  </div>
+    <audio id="audioPlayer" preload="auto"></audio>
+    <audio id="rewindSound" src="./efeitos-sonoros/rebobinar.mp3" preload="auto"></audio>
+    <audio id="clickSound" src="./efeitos-sonoros/click-botao.mp3" preload="auto"></audio>
+    <audio id="insertSound" src="./efeitos-sonoros/casette_in.mp3" preload="auto"></audio>
 
-  <audio id="audioPlayer" preload="auto"></audio>
+    <script>
+      let audioPlayer;
+      let rewindSound;
+      let clickSound;
+      let insertSound;
+      let currentSongIndex = 0;
 
-  <script>
-    let audioPlayer; // A variável para o elemento <audio>
-    let currentSongIndex = 0; // Usado para a playlist
+      const playlist = [
+        { src: './musicas/Jão - Locadora (Lyric Video).mp3', title: 'Locadora - Jão' },
+        { src: './musicas/bags_clairo.mp3', title: 'Bags - Clairo' },
+        { src: './musicas/No Escuro.mp3', title: 'No Escuro - Ana Gabriela, Anavitória' },
+        { src: './musicas/Quero contar pra São Paulo.mp3', title: 'Quero contar pra São Paulo - Anavitória' },
+        { src: './musicas/Jão - Religião (Visualizer).mp3', title: 'Religião - Jão' },
+        { src: './musicas/Lagum - Meu Esquema (Clipe Oficial).mp3', title: 'Meu Esquema - Lagum' },
+        { src: './musicas/LAGUM - Vida Novela.mp3', title: 'Vida Novela - Lagum' },
+        { src: './musicas/Laufey - Valentine (Official Audio).mp3', title: 'Valentine - Laufey' },
+        { src: './musicas/Liniker - CAJU (Visual Experience).mp3', title: 'CAJU - Liniker' },
+        { src: './musicas/Muse - Starlight [Official Music Video].mp3', title: 'Starlight - Muse' },
+        { src: './musicas/The 1975 - About You (Official).mp3', title: 'About You - The 1975' },
+        { src: './musicas/The Police - Every Breath You Take (Official Music Video).mp3', title: 'Every Breath You Take - The Police' },
+        { src: './musicas/Transante - LAGUM.mp3', title: 'Transante - Lagum' },
+      ];
 
-    const playlist = [
-      { src: './musicas/Jão - Locadora (Lyric Video).mp3', title: 'Locadora - Jão' },
-      { src: './musicas/bags_clairo.mp3', title: 'Bags - Clairo' },
-      { src: './musicas/No Escuro.mp3', title: 'No Escuro - Ana Gabriela, Anavitória' },
-      { src: './musicas/Quero contar pra São Paulo.mp3', title: 'Quero contar pra São Paulo - Anavitória' },
-      { src: './musicas/Jão - Religião (Visualizer).mp3', title: 'Religião - Jão' },
-      { src: './musicas/Lagum - Meu Esquema (Clipe Oficial).mp3', title: 'Meu Esquema - Lagum' },
-      { src: './musicas/LAGUM - Vida Novela.mp3', title: 'Vida Novela - Lagum' },
-      { src: './musicas/Laufey - Valentine (Official Audio).mp3', title: 'Valentine - Laufey' },
-      { src: './musicas/Liniker - CAJU (Visual Experience).mp3', title: 'CAJU - Liniker' },
-      { src: './musicas/Muse - Starlight [Official Music Video].mp3', title: 'Starlight - Muse' },
-      { src: './musicas/The 1975 - About You (Official).mp3', title: 'About You - The 1975' },
-      { src: './musicas/The Police - Every Breath You Take (Official Music Video).mp3', title: 'Every Breath You Take - The Police' },
-      { src: './musicas/Transante - LAGUM.mp3', title: 'Transante - Lagum' },
-    ];
+      const cassette = document.getElementById('cassette');
+      const playInput = document.getElementById('playBtn');
+      const pauseInput = document.getElementById('pauseBtn');
+      const prevInput = document.getElementById('prevBtn');
+      const nextInput = document.getElementById('nextBtn');
+      const mixtapeTitleDisplay = document.getElementById('mixtape-title');
+      const insertInput = document.getElementById('insertBtn');
 
-    const cassette = document.getElementById('cassette');
-    const playInput = document.getElementById('playBtn');
-    const pauseInput = document.getElementById('pauseBtn');
-    const prevInput = document.getElementById('prevBtn');
-    const nextInput = document.getElementById('nextBtn');
-    const mixtapeTitleDisplay = document.getElementById('mixtape-title');
+      document.addEventListener('DOMContentLoaded', () => {
+        audioPlayer = document.getElementById('audioPlayer');
+        rewindSound = document.getElementById('rewindSound');
+        clickSound = document.getElementById('clickSound');
+        insertSound = document.getElementById('insertSound');
 
-    // Adiciona uma nova constante para o novo botão de inserir
-    const insertInput = document.getElementById('insertBtn');
+        // --- AJUSTE DE VOLUME AQUI ---
+        if (rewindSound) rewindSound.volume = 0.3; // **NOVO:** 30% do volume para o som de rebobinar
+        if (clickSound) clickSound.volume = 0.5;   // Permanece 50% para o clique (ou ajuste se quiser)
+        if (insertSound) insertSound.volume = 0.7; // Permanece 70% para o inserir fita (ou ajuste se quiser)
+        // --- FIM DO AJUSTE DE VOLUME ---
 
+        loadSong(currentSongIndex);
 
-    // Inicializa o player de áudio quando o DOM estiver carregado
-    document.addEventListener('DOMContentLoaded', () => {
-      audioPlayer = document.getElementById('audioPlayer');
-      // Carrega a primeira música da playlist
-      loadSong(currentSongIndex);
+        audioPlayer.addEventListener('play', () => {
+          cassette.classList.add('spinning');
+          playInput.checked = true;
+          pauseInput.checked = false;
+          insertInput.checked = false;
+          console.log('Áudio: Reproduzindo');
+        });
 
-      // Eventos do elemento <audio>
-      audioPlayer.addEventListener('play', () => {
-        cassette.classList.add('spinning');
-        playInput.checked = true;
-        pauseInput.checked = false;
-        // Ao dar play, desmarcar o botão Insert (se estiver marcado)
-        insertInput.checked = false; 
-        console.log('Áudio: Reproduzindo');
-      });
+        audioPlayer.addEventListener('pause', () => {
+          cassette.classList.remove('spinning');
+          pauseInput.checked = true;
+          playInput.checked = false;
+          console.log('Áudio: Pausado');
+        });
 
-      audioPlayer.addEventListener('pause', () => {
-        cassette.classList.remove('spinning');
-        pauseInput.checked = true;
-        playInput.checked = false;
-        console.log('Áudio: Pausado');
-      });
-
-      audioPlayer.addEventListener('ended', () => {
-        console.log('Áudio: Terminou, avançando para a próxima.');
-        nextSong();
-      });
-
-      audioPlayer.addEventListener('error', (e) => {
-        console.error('Erro ao reproduzir áudio:', e);
-        mixtapeTitleDisplay.textContent = "Erro de Áudio!";
-      });
-
-      updateMixtapeTitle(); // Atualiza o título inicial no visor
-      console.log('Player de áudio inicializado.');
-    });
-
-    function loadSong(index) {
-      if (playlist.length === 0) {
-        mixtapeTitleDisplay.textContent = "Playlist Vazia!";
-        return;
-      }
-      if (index >= 0 && index < playlist.length) {
-        audioPlayer.src = playlist[index].src;
-        audioPlayer.load(); // Carrega a nova fonte
-        updateMixtapeTitle();
-        console.log('Música carregada:', playlist[index].title);
-      }
-    }
-
-    function updateMixtapeTitle() {
-      if (playlist[currentSongIndex] && playlist[currentSongIndex].title) {
-        mixtapeTitleDisplay.textContent = playlist[currentSongIndex].title;
-      } else {
-        mixtapeTitleDisplay.textContent = "Mixtape do Amor";
-      }
-    }
-
-    function playSong() {
-      console.log("Chamado: playSong()");
-      if (!audioPlayer) return;
-      audioPlayer.play().catch(error => {
-        console.error("Erro ao tentar reproduzir o áudio (provavelmente autoplay bloqueado):", error);
-        mixtapeTitleDisplay.textContent = "Clique para tocar!";
-      });
-    }
-
-    function pauseSong() {
-      console.log("Chamado: pauseSong()");
-      if (!audioPlayer) return;
-      audioPlayer.pause();
-    }
-
-    function nextSong() {
-      console.log("Chamado: nextSong()");
-      currentSongIndex = (currentSongIndex + 1) % playlist.length;
-      loadSong(currentSongIndex);
-      // Se estava tocando, começa a tocar a próxima automaticamente
-      if (audioPlayer.paused) {
-          // Se estava pausado, apenas carrega a próxima, não toca
-      } else {
-          playSong();
-      }
-    }
-
-    function prevSong() {
-      console.log("Chamado: prevSong()");
-      currentSongIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
-      loadSong(currentSongIndex);
-      // Se estava tocando, começa a tocar a anterior automaticamente
-      if (audioPlayer.paused) {
-          // Se estava pausado, apenas carrega a anterior, não toca
-      } else {
-          playSong();
-      }
-    }
-
-    // Event listener para o botão de Insert - Lógica AJUSTADA E MAIS ROBUSTA
-    insertInput.addEventListener('change', () => {
-      console.log("Evento 'change' no botão Insert. Checked:", insertInput.checked);
-
-      // Usamos classList.toggle para alternar a classe: se tem, remove; se não tem, adiciona.
-      cassette.classList.toggle('inserted'); 
-
-      // Desmarcar os controles de áudio quando o insert é clicado
-      playInput.checked = false; 
-      pauseInput.checked = false;
-      audioPlayer.pause(); // Pausa a música ao inserir/ejetar a fita
-
-      // Para o botão Insert voltar à posição "não pressionada" rapidamente
-      // (Isso é opcional, se preferir que ele fique pressionado, remova esta linha)
-      setTimeout(() => { 
-        insertInput.checked = false; 
-        console.log("Botão Insert desmarcado após delay.");
-      }, 700); // Um pouco mais longo que a animação da fita
-    });
-
-    playInput.addEventListener('change', () => {
-        console.log("Evento 'change' no botão Play.");
-        if (playInput.checked) {
-            playSong();
-            insertInput.checked = false; // Desmarcar o botão Insert ao dar play
-            cassette.classList.add('inserted'); // Garante que a fita esteja inserida ao dar play
-        }
-    });
-
-    pauseInput.addEventListener('change', () => {
-        console.log("Evento 'change' no botão Pause.");
-        if (pauseInput.checked) {
-            pauseSong();
-        }
-    });
-
-    nextInput.addEventListener('change', () => {
-        console.log("Evento 'change' no botão Next.");
-        if (nextInput.checked) {
+        audioPlayer.addEventListener('ended', () => {
+          console.log('Áudio: Terminou, avançando para a próxima.');
           nextSong();
-          // Desmarcar o botão após a ação, para permitir outro clique
-          setTimeout(() => { nextInput.checked = false; }, 100);
-          insertInput.checked = false; // Desmarcar o Insert ao pular de música
-        }
-    });
+        });
 
-    prevInput.addEventListener('change', () => {
-        console.log("Evento 'change' no botão Prev.");
-        if (prevInput.checked) {
-          prevSong();
-          // Desmarcar o botão após a ação, para permitir outro clique
-          setTimeout(() => { prevInput.checked = false; }, 100);
-          insertInput.checked = false; // Desmarcar o Insert ao pular de música
+        audioPlayer.addEventListener('error', (e) => {
+          console.error('Erro ao reproduzir áudio:', e);
+          mixtapeTitleDisplay.textContent = "Erro de Áudio!";
+        });
+
+        updateMixtapeTitle();
+        console.log('Player de áudio inicializado.');
+
+        // Adiciona event listeners para os botões de controle para tocar o som de clique
+        document.querySelectorAll('.radio-button-group input[type="radio"]').forEach(button => {
+          if (button.id !== 'insertBtn') { // Exclui o botão de insert, que tem um som específico
+            button.addEventListener('click', () => {
+              if (clickSound) {
+                clickSound.currentTime = 0; // Reinicia o som
+                clickSound.play().catch(e => console.error("Erro ao tocar som de clique:", e));
+
+                // NOVO: Parar o som de clique após 2 segundos
+                setTimeout(() => {
+                  clickSound.pause();
+                  clickSound.currentTime = 0; // Opcional: Reseta para o início caso queira tocá-lo do zero novamente
+                }, 2000); // 2000 milissegundos = 2 segundos
+              }
+            });
+          }
+        });
+      });
+
+      function loadSong(index) {
+        if (playlist.length === 0) {
+          mixtapeTitleDisplay.textContent = "Playlist Vazia!";
+          return;
         }
-    });
-  </script>
-</body>
-</html>
+        if (index >= 0 && index < playlist.length) {
+          audioPlayer.src = playlist[index].src;
+          audioPlayer.load();
+          updateMixtapeTitle();
+          console.log('Música carregada:', playlist[index].title);
+        }
+      }
+
+      function updateMixtapeTitle() {
+        if (playlist[currentSongIndex] && playlist[currentSongIndex].title) {
+          mixtapeTitleDisplay.textContent = playlist[currentSongIndex].title;
+        } else {
+          mixtapeTitleDisplay.textContent = "Mixtape do Amor";
+        }
+      }
+
+      function playSong() {
+        console.log("Chamado: playSong()");
+        if (!audioPlayer) return;
+        audioPlayer.play().catch(error => {
+          console.error("Erro ao tentar reproduzir o áudio (provavelmente autoplay bloqueado):", error);
+          mixtapeTitleDisplay.textContent = "Clique para tocar!";
+        });
+      }
+
+      function pauseSong() {
+        console.log("Chamado: pauseSong()");
+        if (!audioPlayer) return;
+        audioPlayer.pause();
+      }
+
+      function nextSong() {
+        console.log("Chamado: nextSong()");
+        if (!audioPlayer) return;
+
+        // Corta o som de rebobinar imediatamente se estiver tocando
+        if (rewindSound) {
+          rewindSound.pause();
+          rewindSound.currentTime = 0;
+        }
+        audioPlayer.pause(); // Pausa a música atual
+
+        if (rewindSound) {
+          rewindSound.currentTime = 0; // Reinicia o som para tocar
+          rewindSound.play().catch(e => console.error("Erro ao tocar som de rebobinar:", e));
+
+          // NOVO: Parar o som de rebobinar após 2 segundos
+          setTimeout(() => {
+            rewindSound.pause();
+            rewindSound.currentTime = 0;
+          }, 2000); // 2000 milissegundos = 2 segundos
+        }
+
+        setTimeout(() => {
+          currentSongIndex = (currentSongIndex + 1) % playlist.length;
+          loadSong(currentSongIndex);
+          if (!audioPlayer.paused) {
+              playSong();
+          }
+        }, 2500); // NOVO: Delay total para a música começar é de 2.5 segundos
+      }
+
+      function prevSong() {
+        console.log("Chamado: prevSong()");
+        if (!audioPlayer) return;
+
+        // Corta o som de rebobinar imediatamente se estiver tocando
+        if (rewindSound) {
+          rewindSound.pause();
+          rewindSound.currentTime = 0;
+        }
+        audioPlayer.pause(); // Pausa a música atual
+
+        if (rewindSound) {
+          rewindSound.currentTime = 0; // Reinicia o som para tocar
+          rewindSound.play().catch(e => console.error("Erro ao tocar som de rebobinar:", e));
+
+          // NOVO: Parar o som de rebobinar após 2 segundos
+          setTimeout(() => {
+            rewindSound.pause();
+            rewindSound.currentTime = 0;
+          }, 2000); // 2000 milissegundos = 2 segundos
+        }
+
+        setTimeout(() => {
+          currentSongIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
+          loadSong(currentSongIndex);
+          if (!audioPlayer.paused) {
+              playSong();
+          }
+        }, 2500); // NOVO: Delay total para a música começar é de 2.5 segundos
+      }
+
+      insertInput.addEventListener('change', () => {
+        console.log("Evento 'change' no botão Insert. Checked:", insertInput.checked);
+        
+        if (insertSound) { // Toca o som de inserção
+          insertSound.currentTime = 0;
+          insertSound.play().catch(e => console.error("Erro ao tocar som de inserção:", e));
+        }
+
+        cassette.classList.toggle('inserted'); 
+        playInput.checked = false; 
+        pauseInput.checked = false;
+        audioPlayer.pause();
+
+        setTimeout(() => { 
+          insertInput.checked = false; 
+          console.log("Botão Insert desmarcado após delay.");
+        }, 700);
+      });
+
+      playInput.addEventListener('change', () => {
+          console.log("Evento 'change' no botão Play.");
+          if (playInput.checked) {
+              playSong();
+              insertInput.checked = false;
+              cassette.classList.add('inserted');
+          }
+      });
+
+      pauseInput.addEventListener('change', () => {
+          console.log("Evento 'change' no botão Pause.");
+          if (pauseInput.checked) {
+              pauseSong();
+          }
+      });
+
+      nextInput.addEventListener('change', () => {
+          console.log("Evento 'change' no botão Next.");
+          if (nextInput.checked) {
+            nextSong();
+            setTimeout(() => { nextInput.checked = false; }, 100);
+            insertInput.checked = false;
+          }
+      });
+
+      prevInput.addEventListener('change', () => {
+          console.log("Evento 'change' no botão Prev.");
+          if (prevInput.checked) {
+            prevSong();
+            setTimeout(() => { prevInput.checked = false; }, 100);
+            insertInput.checked = false;
+          }
+      });
+    </script>
+  </body>
+  </html>
