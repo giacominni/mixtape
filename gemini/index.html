@@ -17,6 +17,7 @@
       color: #333;
       user-select: none;
       overflow: hidden; /* Evita scroll indesejado durante as animações */
+      overflow-x: hidden; /* Garante que não haverá rolagem horizontal */
     }
 
     h1 {
@@ -32,9 +33,9 @@
       border-radius: 15px; /* Bordas mais arredondadas */
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Sombra mais suave e proeminente */
       padding: 40px; /* Mais padding interno */
-      width: 550px; /* Largura um pouco maior */
-      max-width: 95%; /* **NOVO:** Para ser responsivo em telas menores */
-      box-sizing: border-box; /* **NOVO:** Garante que o padding não aumente a largura total */
+      max-width: 550px; /* Definirá a largura máxima em telas grandes */
+      width: 95%; /* O rádio ocupará 95% da largura da tela, e não mais que 550px */
+      box-sizing: border-box; /* Crucial para o padding não aumentar a largura total */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -360,86 +361,134 @@
       }
     }
 
-    /* --- Media Queries para Responsividade --- */
+    /* --- Media Queries para Responsividade (Ajustes Detalhados para Celular) --- */
     @media (max-width: 600px) { /* Aplica-se a telas com no máximo 600px de largura */
       body {
-        height: auto; 
+        height: auto;
         min-height: 100vh;
-        padding: 20px 0;
+        padding: 10px 0; /* Menos padding vertical */
+        overflow-x: hidden;
       }
 
       h1 {
-        font-size: 1.8em; 
-        margin-bottom: 15px;
+        font-size: 1.4em; /* Título um pouco menor */
+        margin-bottom: 10px;
       }
 
       .radio-container {
-        width: 95%; /* Ocupa quase toda a largura da tela em celulares */
-        height: auto; /* Deixa a altura flexível para o conteúdo se ajustar */
-        padding: 25px; /* Reduz o padding para não consumir muito espaço */
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra mais suave */
+        max-width: 550px; /* Mantém a largura máxima para desktop */
+        width: 98%; /* Ocupa quase 100% da largura em mobile */
+        padding: 15px; /* Reduzindo ainda mais o padding interno do rádio */
+        height: auto; /* A altura será determinada pelo conteúdo */
+        min-height: 500px; /* Garante que o rádio não fique 'amassado' demais */
       }
 
       .speaker-grill {
-        height: 45px; 
+        width: 90%;
+        height: 35px; /* Grade do alto-falante mais compacta */
+      }
+
+      .speaker-grill div {
+        width: 6px; /* Furos menores */
+        height: 6px;
       }
 
       .display-area {
-        height: 100px; 
-        font-size: 1.2em; 
+        width: 90%;
+        height: 70px; /* Visor mais compacto */
+        font-size: 1em; /* Tamanho da fonte do visor */
+        padding: 3px 5px; /* Menos padding no visor */
       }
 
       .radio-knobs {
-        flex-wrap: wrap;
-        gap: 15px;
+        width: 95%; /* Ocupa mais largura */
+        justify-content: space-around; /* Mantém o espaçamento flexível */
         margin-top: 15px;
+        gap: 8px; /* Reduzindo o gap entre os knobs */
       }
 
       .knob {
-        width: 45px; 
+        width: 45px; /* Knobs ligeiramente menores */
         height: 45px;
         font-size: 0.7em;
       }
 
       .cassette-deck {
-        height: 180px; 
+        width: 90%; /* Deck da fita ocupa mais largura */
+        height: 150px; /* Deck mais compacto */
         margin-top: 20px;
+        padding: 5px; /* Adicionado padding para o deck, caso não tivesse */
+        box-sizing: border-box; /* Garante que o padding não aumente o tamanho */
       }
 
+      /* Estilos da fita cassete */
       .card {
-        width: 240px; 
-        height: 120px;
-        transform: translateY(160px); /* Ajusta a posição de inserção para a fita menor */
+        width: 210px; /* Largura da fita reduzida */
+        height: 105px; /* Altura da fita reduzida para manter proporção (2:1) */
+        padding: 5px; /* Padding da fita reduzido */
+        transform: translateY(155px); /* Ajusta a posição de inserção (metade da altura do deck + metade da altura da fita) */
+      }
+
+      .roll {
+        padding: 3px 10px; /* Padding dos rolos */
+      }
+
+      .tape {
+        width: 18px; /* Carreteis menores */
+        height: 18px;
+      }
+
+      .s_wheel, .e_wheel {
+        width: 10px; /* Rodinhas menores */
+        height: 10px;
+      }
+
+      .num {
+        font-size: 0.6em; /* Texto do contador da fita menor */
+      }
+
+      .or {
+        padding: 3px;
+        font-size: 0.7em;
       }
 
       .player-controls {
-        flex-direction: column; 
-        align-items: center;
-        margin-top: 20px;
-        gap: 15px;
+        flex-direction: row; /* Tenta manter os botões na horizontal */
+        flex-wrap: wrap; /* Permite quebrar, mas com mais espaço */
+        justify-content: center;
+        margin-top: 15px;
+        gap: 8px; /* Reduzindo gap entre grupos de botões */
+        width: 100%; /* Garante que o container de controles ocupe toda a largura */
       }
 
       .radio-button-group {
-        width: 90%; 
+        width: auto; /* Permite que o grupo de botões ocupe apenas o espaço necessário */
+        padding: 4px; /* Padding menor no grupo */
         height: auto;
-        padding: 10px;
-        flex-wrap: wrap; 
-        justify-content: center;
+        flex-wrap: nowrap; /* Tenta forçar os botões a ficarem na mesma linha DENTRO do grupo */
+        gap: 4px; /* Gap mínimo entre os botões */
+        justify-content: space-around; /* Melhor distribuição dos botões dentro do grupo */
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08); /* Sombra mais sutil */
       }
 
       .radio-button-group .label {
-        width: 60px; 
-        height: 70px;
-        padding: 6px 4px;
-        font-size: 0.8em;
+        width: 48px; /* Botões de controle menores */
+        height: 55px; /* Altura dos botões */
+        padding: 4px 2px; /* Padding interno dos botões */
       }
 
       .radio-button-group .label[for="insertBtn"] {
-        width: 70px; 
+        width: 58px; /* Ajuste para o botão Insert ser um pouco maior */
       }
 
       .radio-button-group .label .text {
-        font-size: 13px; 
+        font-size: 10px; /* Fonte bem pequena para o texto dos botões */
+        line-height: 10px; /* Ajusta a altura da linha */
+      }
+
+      .radio-button-group .label:has(input[type="radio"]:checked) {
+        transform: perspective(150px) rotateX(-15deg); /* Ajuste para o efeito de botão pressionado */
+        margin-top: 4px; /* Ajuste para o botão pressionado */
       }
     }
   </style>
